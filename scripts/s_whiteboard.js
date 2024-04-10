@@ -9,9 +9,7 @@ var savedUndos = {};
 var saveDelay = {};
 
 if (config.backend.enableFileDatabase) {
-    // make sure that folder with saved boards exists
     fs.mkdirSync(FILE_DATABASE_FOLDER, {
-        // this option also mutes an error if path exists
         recursive: true,
     });
 }

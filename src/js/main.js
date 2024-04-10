@@ -9,6 +9,7 @@ import ReadOnlyService from "./services/ReadOnlyService.js";
 import InfoService from "./services/InfoService.js";
 import { getSubDir } from "./utils.js";
 import ConfigService from "./services/ConfigService.js";
+import jsPDF from 'jspdf';
 import { v4 as uuidv4 } from "uuid";
 
 import pdfjsLib from "pdfjs-dist";
@@ -348,31 +349,96 @@ function initWhiteboard() {
             });
 
         // save image as imgae
-        $("#saveAsImageBtn")
-            .off("click")
-            .click(function () {
-                whiteboard.getImageDataBase64(
-                    {
-                        imageFormat: ConfigService.imageDownloadFormat,
-                        drawBackgroundGrid: ConfigService.drawBackgroundGrid,
-                    },
-                    function (imgData) {
-                        var w = window.open("about:blank"); //Firefox will not allow downloads without extra window
-                        setTimeout(function () {
-                            //FireFox seems to require a setTimeout for this to work.
-                            var a = document.createElement("a");
-                            a.href = imgData;
-                            a.download = "whiteboard." + ConfigService.imageDownloadFormat;
-                            w.document.body.appendChild(a);
-                            a.click();
-                            w.document.body.removeChild(a);
-                            setTimeout(function () {
-                                w.close();
-                            }, 100);
-                        }, 0);
-                    }
-                );
-            });
+        // $("#saveAsImageBtn")
+        //     .off("click")
+        //     .click(function () {
+        //         whiteboard.getImageDataBase64(
+        //             {
+        //                 imageFormat: ConfigService.imageDownloadFormat,
+        //                 drawBackgroundGrid: ConfigService.drawBackgroundGrid,
+        //             },
+        //             function (imgData) {
+        //                 var w = window.open("about:blank"); //Firefox will not allow downloads without extra window
+        //                 setTimeout(function () {
+        //                     //FireFox seems to require a setTimeout for this to work.
+        //                     var a = document.createElement("a");
+        //                     a.href = imgData;
+        //                     a.download = "whiteboard." + ConfigService.imageDownloadFormat;
+        //                     w.document.body.appendChild(a);
+        //                     a.click();
+        //                     w.document.body.removeChild(a);
+        //                     setTimeout(function () {
+        //                         w.close();
+        //                     }, 100);
+        //                 }, 0);
+        //             }
+        //         );
+        //     });
+
+    //     $("#saveAsImageBtn")
+    // .off("click")
+    // .click(function () {
+    //     whiteboard.getImageDataBase64(
+    //         {
+    //             imageFormat: ConfigService.imageDownloadFormat,
+    //             drawBackgroundGrid: ConfigService.drawBackgroundGrid,
+    //         },
+    //         function (imgData) {
+    //             if (imgData) {
+    //                 var w = window.open("about:blank");
+    //                 if (w) {
+    //                     setTimeout(function () {
+    //                         var a = document.createElement("a");
+    //                         a.href = imgData;
+    //                         a.download = "whiteboard." + ConfigService.imageDownloadFormat;
+    //                         w.document.body.appendChild(a);
+    //                         a.click();
+    //                         w.document.body.removeChild(a);
+    //                         setTimeout(function () {
+    //                             w.close();
+    //                         }, 100);
+    //                     }, 0);
+    //                 } else {
+    //                     console.error("Unable to open new window.");
+    //                 }
+    //             } else {
+    //                 console.error("Failed to get image data.");
+    //             }
+    //         }
+    //     );
+    // });
+
+    $("#saveAsImageBtn")
+    .off("click")
+    .click(function () {
+        whiteboard.getImageDataBase64(
+            {
+                imageFormat: ConfigService.imageDownloadFormat,
+                drawBackgroundGrid: ConfigService.drawBackgroundGrid,
+            },
+            function (imgData) {
+                if (imgData) {
+                    // Create a jsPDF instance with custom page size (adjust as needed)
+                    var pdf = new jsPDF({
+                        orientation: 'landscape',
+                        unit: 'px',
+                        format: [1920, 1080] // Adjust page size as needed
+                    });
+
+                    // Add the image with adjusted dimensions to fit within the page
+                    pdf.addImage(imgData, 'JPEG', 0, 0, 1200, 800); // Adjust width and height as needed
+
+                    // Save the PDF
+                    pdf.save("whiteboard.pdf");
+                } else {
+                    console.error("Failed to get image data.");
+                }
+            }
+        );
+    });
+
+
+
 
         // save image to json containing steps
         $("#saveAsJSONBtn")
