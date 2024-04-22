@@ -419,17 +419,14 @@ function initWhiteboard() {
             function (imgData) {
                 if (imgData) {
                     // Create a jsPDF instance with custom page size (adjust as needed)
-                    var pdf = new jsPDF({
-                        orientation: 'landscape',
-                        unit: 'px',
-                        format: [1920, 1080] // Adjust page size as needed
-                    });
+                    html2canvas(document.querySelector(".page"), {scale: "2"}).then(canvas => {
 
-                    // Add the image with adjusted dimensions to fit within the page
-                    pdf.addImage(imgData, 'JPEG', 0, 0, 1200, 800); // Adjust width and height as needed
-
-                    // Save the PDF
-                    pdf.save("whiteboard.pdf");
+                        this.imgFile = canvas.toDataURL("image/jpeg", 0.3);
+                        var doc = new jsPDF('p', 'mm', 'a4', true);
+                        doc.addImage(this.imgFile, "JPEG", 5, 0, 210, 297, undefined,'FAST');
+                        doc.save('Test.pdf');
+                    
+                      })
                 } else {
                     console.error("Failed to get image data.");
                 }
